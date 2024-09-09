@@ -310,4 +310,12 @@ h3 {
     
 }
 
-
+.assignments  {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 150px;
+    font-size: 30px;
+    font-family: Didot;
+    text-align: center;
+}
