@@ -1,0 +1,152 @@
+<script src=lib1.js></script>
+
+<body bgcolor=black text=white link=white alink=white vlink=white>
+<center>
+<canvas id='canvas1' width=400 height=400></canvas>
+</center>
+</body>
+
+
+<!!-------- VERTEX SHADER: YOU PROBABLY DON'T WANT TO CHANGE THIS RIGHT NOW -------->
+
+<script id='my_vertex_shader' type='x-shader/x-vertex'>
+   attribute vec3 aPos;
+   varying   vec3 vPos;
+   void main() {
+      gl_Position = vec4(aPos, 1.);
+      vPos = aPos;
+   }
+</script>
+
+
+<!!-------- FRAGMENT SHADER: THIS IS WHERE YOU WILL DO YOUR WORK -------->
+
+<script id='my_fragment_shader' type='x-shader/x-fragment'>
+
+ uniform float uTime;   // TIME, IN SECONDS
+
+ varying vec3 vPos;     // -1 < vPos.x < +1
+                        // -1 < vPos.y < +1
+                        //      vPos.z == 0
+
+ // A FRAGMENT SHADER MUST DEFINE main().
+
+void main() {
+   vec3 rgb = vec3(0.0);
+
+   float t = uTime * 3.0;
+
+   float x = vPos.x * 1.5;
+   float y = vPos.y * 1.5;
+
+   float trailDecay = 0.9;
+
+   for (int i = 0; i < 10; i++) {
+       float trailTime = t - float(i) * 0.05;
+
+       float wave = sin(x * 5.0 + trailTime) * 0.3 + cos(y * 4.0 + trailTime * 1.5) * 0.3;
+
+       float size = 0.2 + 0.05 * sin(trailTime * 2.0);
+       float dist = length(vec2(x, y) + vec2(wave, wave));
+
+       vec3 cubeColor = mix(vec3(0.3, 0.1, 0.5), vec3(0.1, 1.0, 0.4), y + 0.5);
+
+       float highlight = max(0.0, 1.0 - dist / size);
+       rgb += highlight * cubeColor * pow(trailDecay, float(i));
+
+       float glow = exp(-dist * 3.0);
+       rgb += glow * vec3(0.5, 0.3, 1.0) * pow(trailDecay, float(i));
+
+      trailDecay *= 0.95;
+
+      float particleDist = length(vec2(x, y) - vec2(sin(t * 0.5), cos(t * 0.4)));
+      float particleGlow = exp(-particleDist * 20.0);
+      rgb += particleGlow * vec3(1.0, 0.5, 0.2) * (0.5 + 0.5 * sin(t * 0.5));
+   }
+
+   float starField = (sin(dot(vec2(x, y) * 10.0, vec2(12.9898, 78.233))) * 43758.5453);
+   rgb += noise(vec3(starField)) * 0.05;
+
+   gl_FragColor = vec4(sqrt(rgb), 1.0);
+}
+
+
+
+
+</script>
+
+
+<!!-------- CREATE A PROPERLY DESCRIPTIVE TITLE BELOW -------->
+
+<script id='my_title' type='text/html'>
+THIS IS A VERY COOL SHADER PROGRAM.
+</script>
+
+
+<!!-------- HERE IS WHERE YOU CAN PROVIDE A LONGER TEXT DESCRIPTION -------->
+
+<script id='my_instructions' type='text/html'><font color=#b0b0b0>
+Map x and y to
+<br>
+green and red.
+</script>
+
+
+<!!-------- YOU PROBABLY DON'T WANT TO CHANGE ANYTHING BELOW FOR NOW -------->
+   
+<script>
+
+// CREATE THE HTML DOCUMENT
+
+let vs = my_vertex_shader.innerHTML,
+    fs = my_fragment_shader.innerHTML;
+    fs = fs.substring(1, fs.length);
+
+document.body.innerHTML = [''
+   ,'<center><font size=6 color=#b0b0b0>' + my_title.innerHTML + '</center>'
+   ,'<TABLE cellspacing=0 cellpadding=0><TR>'
+   ,'<td width=50></td><td><font color=red size=5><div id=errorMessage>&nbsp;</div></font></td>'
+   ,'</TR><TR>'
+   ,'<table cellspacing=10>'
+   ,'<tr>'
+   ,'<td valign=top><font size=2 color=red><div id=errorMarker>&nbsp;</div></font></td>'
+   ,'<td valign=top>'
+   ,'<textArea id=textArea spellcheck=false '
+   ,'style="font:16px courier;outline-width:0;border-style:none;resize:none;overflow:scroll;"'
+   ,'></textArea>'
+   ,'</td><td valign=top>' + document.body.innerHTML + '</td>'
+   ,'<td valign=top><font size=5>' + my_instructions.innerHTML + '</td>'
+   ,'</tr></table>'
+   ,'</TR></TABLE>'
+   ].join('');
+
+// SET UP THE EDITABLE TEXT AREA ON THE LEFT SIDE.
+
+let text = fs.split('\n'), cols = 0;
+for (let i = 0 ; i < text.length ; i++)
+   cols = Math.max(cols, text[i].length);
+
+textArea.rows = text.length;
+textArea.cols = cols;
+textArea.value = fs;
+textArea.style.backgroundColor = '#202020';
+textArea.style.color = 'white';
+
+// REPARSE THE SHADER PROGRAM AFTER EVERY KEYSTROKE.
+
+textArea.onkeyup = function() { canvas1.setShaders(vs, this.value); }
+
+// SET THE CURRENT TIME IN SECONDS BEFORE RENDERING EACH FRAME.
+
+let startTime = Date.now();
+
+function animate(gl) {
+   let time = (Date.now() - startTime) / 1000;
+   setUniform('1f', 'uTime', time);
+}
+
+// START EVERYTHING.
+
+gl_start(canvas1, vs, fs);
+</script>
+
