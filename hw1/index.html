@@ -31,46 +31,45 @@
 
  // A FRAGMENT SHADER MUST DEFINE main().
 
-void main() {
+ void main() {
    vec3 rgb = vec3(0.0);
 
-   float t = uTime * 3.0;
+   float t = uTime * 1.5;
 
-   float x = vPos.x * 1.5;
-   float y = vPos.y * 1.5;
+   float x = vPos.x * 2.0;
+   float y = vPos.y * 2.0;
+   float z = 0.5;
 
-   float trailDecay = 0.9;
+   float angleX = t * 0.5; 
+   float angleY = t * 0.7; 
 
-   for (int i = 0; i < 10; i++) {
-       float trailTime = t - float(i) * 0.05;
+   float rotatedY = cos(angleX) * y - sin(angleX) * z;
+   float rotatedZ1 = sin(angleX) * y + cos(angleX) * z;
 
-       float wave = sin(x * 5.0 + trailTime) * 0.3 + cos(y * 4.0 + trailTime * 1.5) * 0.3;
+   float rotatedX = cos(angleY) * x + sin(angleY) * rotatedZ1;
+   float rotatedZ = -sin(angleY) * x + cos(angleY) * rotatedZ1;
 
-       float size = 0.2 + 0.05 * sin(trailTime * 2.0);
-       float dist = length(vec2(x, y) + vec2(wave, wave));
+   float perspectiveFactor = 1.0 / (1.5 - rotatedZ);
+   float perspectiveX = rotatedX * perspectiveFactor;
+   float perspectiveY = rotatedY * perspectiveFactor;
 
-       vec3 cubeColor = mix(vec3(0.3, 0.1, 0.5), vec3(0.1, 1.0, 0.4), y + 0.5);
+   float size = 0.2 + 0.05 * sin(t * 2.0);
+   float dist = length(vec2(perspectiveX, perspectiveY));
 
-       float highlight = max(0.0, 1.0 - dist / size);
-       rgb += highlight * cubeColor * pow(trailDecay, float(i));
+   vec3 cubeColor = mix(vec3(0.3, 0.1, 0.5), vec3(0.1, 1.0, 0.4), perspectiveY + 0.5);
 
-       float glow = exp(-dist * 3.0);
-       rgb += glow * vec3(0.5, 0.3, 1.0) * pow(trailDecay, float(i));
+   float highlight = max(0.0, 1.0 - dist / size);
+   rgb += highlight * cubeColor;
 
-      trailDecay *= 0.95;
+   float glow = exp(-dist * 3.0);
+   rgb += glow * vec3(0.5, 0.3, 1.0);
 
-      float particleDist = length(vec2(x, y) - vec2(sin(t * 0.5), cos(t * 0.4)));
-      float particleGlow = exp(-particleDist * 20.0);
-      rgb += particleGlow * vec3(1.0, 0.5, 0.2) * (0.5 + 0.5 * sin(t * 0.5));
-   }
-
-   float starField = (sin(dot(vec2(x, y) * 10.0, vec2(12.9898, 78.233))) * 43758.5453);
+   float starField = (sin(dot(vec2(perspectiveX, perspectiveY) * 10.0, 
+   vec2(12.9898, 78.233))) * 43758.5453);
    rgb += noise(vec3(starField)) * 0.05;
 
    gl_FragColor = vec4(sqrt(rgb), 1.0);
 }
-
-
 
 
 </script>
