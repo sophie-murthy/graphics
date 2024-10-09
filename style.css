@@ -349,3 +349,18 @@ h3 {
 .hw2:hover {
     color: rgb(166, 203, 214);
 }
+
+.hw3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 350px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+}
+
+.hw3:hover {
+    color: rgb(166, 203, 214);
+}
