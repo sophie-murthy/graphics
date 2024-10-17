@@ -148,51 +148,52 @@ setTimeout(() => {
 **************************************************************************/
 
 
-//       let A = multiply(translation(-4,-3.5,-50),
-//                        multiply(rotationY(s2),
-//                                 multiply(rotationZ(s1),
-// 					 scale(1.5,1,1.5))));
+      let A = multiply(translation(-4,-3.5,-50),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1),
+					 scale(1.5,1,1.5))));
 
-//       //let A = multiply(translation(-4,-3.5,-10), scale(1.5, 1.5, 1.5));
+      //let A = multiply(translation(-4,-3.5,-10), scale(1.5, 1.5, 1.5));
 
       
-//       let B = multiply(translation(0,-3.5,-50),
-//                        multiply(rotationY(s2),
-//                                 multiply(rotationZ(s1),
-// 					 scale(1,1,1))));
+      let B = multiply(translation(0,-3.5,-50),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1),
+					 scale(1,1,1))));
       
-//       let C = multiply(translation(4,-3.5,-50),
-//                        multiply(rotationY(s2),
-//                                 multiply(rotationZ(s1),
-// 					 scale(.7,1.4,1))));
+      let C = multiply(translation(4,-3.5,-50),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1),
+					 scale(.7,1.4,1))));
 
-//       let D = multiply(translation(-2,0,-50),
-//                        multiply(rotationY(s2),
-//                                 multiply(rotationZ(s1),
-// 				         scale(.5,1,1))));
+      let D = multiply(translation(-2,0,-50),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1),
+				         scale(.5,1,1))));
 
-//       let E = multiply(translation(2,0,-50),
-//                        multiply(rotationY(s2),
-//                                 multiply(rotationZ(s1),
-// 					 scale(1,.7,1.3))));
+      let E = multiply(translation(2,0,-50),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1),
+					 scale(1,.7,1.3))));
 
-// /*
-//       let E = multiply(translation(2,0,-20),
-//                        multiply(scale(1,.5,1.5),
-//                                 multiply(rotationZ(s1),
-// 					 rotationY(s2))));
-// */
-//       let F = multiply(translation(0,3.5,-20),
-//                        multiply(rotationY(s2),
-//                                 rotationZ(s1)));
+/*
+      // let E = multiply(translation(2,0,-20),
+      //                  multiply(scale(1,.5,1.5),
+      //                           multiply(rotationZ(s1),
+		// 			 rotationY(s2))));
+*/
+
+      let F = multiply(translation(0,1.8,-20),
+                       multiply(rotationY(s2),
+                                multiply(rotationZ(s1), scale(0.5,0.5,0.5))));
 
 
       // ANIMATE ALL QUADRICS FOR THIS FRAME
 
       let transform = (Q,M) => {
          let MI = matrixInverse(M);
-         console.log("M", M);
-         console.log("MI", MI);
+         // console.log("M", M);
+         // console.log("MI", MI);
          // console.log("transpose", transpose(MI));
          // console.log("mult", multiply(Q, MI));
          // console.log("hello", multiply(transpose(MI), multiply(Q, MI)));
@@ -210,22 +211,21 @@ setTimeout(() => {
       // console.log(A);
       // console.log("sphere", sphere);
       // console.log("iii", transform(sphere, translation(0,-.35,0)));
-      // addShape(A, transform(sphere, translation(0,-.35,0)),
-      //             transform(sphere, translation(0, .35,0)));
+      addShape(A, transform(sphere, translation(0,-.35,0)),
+                  transform(sphere, translation(0, .35,0)), sphere);
       // //addShape(A, sphere);
       
-      // addShape(B, xCylinder, yCylinder, zCylinder);
+      addShape(B, xCylinder, yCylinder, zCylinder);
       
       // //addShape(C, sphere, transform(xSlab, scale(.5,.5,.5)));
-      // addShape(C, sphere);
-      // addShape(D, xCylinder, xSlab);
-      // addShape(E, xSlab, ySlab, zSlab);
-      // addShape(F, yParaboloid, ySlab);
-      let A = multiply(translation(0, 1, 0), scale(4, 5, 1));
-      //A = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
-      addShape(A, sphere, sphere, zCylinder);
+      addShape(C, sphere, sphere, sphere);
+      addShape(D, xCylinder, xSlab, xSlab);
+      addShape(E, xSlab, ySlab, zSlab);
+      addShape(F, yParaboloid, ySlab, ySlab);
+      //let A = multiply(translation(5, -3, 0), scale(1, 2, 1));
+      //let A = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+      //addShape(A, sphere, yCylinder, sphere);
       //addShape(A, xSlab, ySlab, zSlab);
-      console.log("matrix", transform(sphere, translation(-1, 1, 0)));
 
 /*
       let C1 = translation(0, 0, -20);
@@ -234,12 +234,6 @@ setTimeout(() => {
       let C2 = translation(5 * Math.sin(time), 0, -20 + 5 * Math.cos(time));
       addShape(C2, sphere);
 */
-      console.log("Before:", xParaboloid);
-      let transformed = transform(xParaboloid, translation(2, 3, -5));
-      console.log("After:", transformed);
-      console.log("MA", MA);
-      console.log("MB", MB);
-      console.log("MC", MC);
       gl.uniformMatrix4fv(uA, false, MA.flat());
       gl.uniformMatrix4fv(uB, false, MB.flat());
       gl.uniformMatrix4fv(uC, false, MC.flat());
