@@ -22,7 +22,7 @@ vec2 rayQ(vec3 V, vec3 W, mat4 Q) {
 
     float discriminant = (B * B - 4.0 * A * C);
 
-    if (discriminant < 0.0 || abs(A) < 1e-6) return vec2(-1.0, -1.0);
+    if (discriminant < 0.0) return vec2(-1.0, -1.0);
     
     float sqrtDisc = sqrt(discriminant);
     float t1 = (-B - sqrtDisc) / (2.0 * A);
@@ -63,21 +63,64 @@ mat3 rayQ3(vec3 V, vec3 W, mat4 A, mat4 B, mat4 C, int inOut) {
     vec2 tA = rayQ(V, W, A);
     vec2 tB = rayQ(V, W, B);
     vec2 tC = rayQ(V, W, C);
-    float tIn = max(max(tA.x, tB.x), tC.x);
-    tIn = max(tIn, 0.0);
-    float tOut = min(min(tA.y, tB.y), tC.y);
+    int matrixHitIn = 0;
+    float tIn = tA.x;
+    if (tB.x > tIn) {
+        tIn = tB.x;
+        matrixHitIn = 1;
+    }
+    if (tC.x > tIn) {
+        tIn = tC.x;
+        matrixHitIn = 2;
+    }
+    int matrixHitOut = 0;
+    float tOut = tA.y;
+    if (tB.y < tOut) {
+        tOut = tB.y;
+        matrixHitOut = 1;
+    }
+    if (tC.y < tOut) {
+        tOut = tC.y;
+        matrixHitOut = 2;
+    }
 
     if (tIn > tOut || tOut < 0.0) return mat3(vec3(-1.0), vec3(0.0), vec3(0.0));;
 
-    float t = inOut == 0 ? tIn : tOut;
+    vec3 PA, PB, PC;
 
-    vec3 P = V + t * W;
+    for (int i = 0; i < 3; i++) {
+        if (inOut == 0) {
+            PA = V + tA.x * W;
+            PB = V + tB.x * W;
+            PC = V + tC.x * W;
+        } else {
+            PA = V + tA.y * W;
+            PB = V + tB.y * W;
+            PC = V + tC.y * W;
+        }
+    }
+    
+    vec3 P;
+    for (int i = 0; i < 3; i++) {
+        if (matrixHitIn == 0) {
+            P = PA;
+        } else if (matrixHitIn == 1) {
+            P = PB;
+        } else {
+            P = PC;
+        }
+    }
 
-    vec3 N_A = computeNormal(P, A);
-    vec3 N_B = computeNormal(P, B);
-    vec3 N_C = computeNormal(P, C);
-
-    vec3 N = normalize(N_A + N_B + N_C);
+    vec3 N;
+    for (int i = 0; i < 3; i++) {
+        if (matrixHitIn == 0) {
+            N = computeNormal(P, A);
+        } else if (matrixHitIn == 1) {
+            N = computeNormal(P, B);
+        } else {
+            N = computeNormal(P, C);
+        }
+    }
     return mat3(vec3(tIn, tOut, 0.0), P, N);
 }
 
@@ -92,12 +135,11 @@ void main() {
     float power;
     vec3 N, P, R;
     bool inShadow = false;
-    //float tMin = 1000.0;
     
 
     for (int i = 0; i < 6; i++) {
         
-        float tMin = 500.0;
+        float tMin = 100.0;
         mat3 result = rayQ3(V, W, uA[i], uB[i], uC[i], 0);
         float tIn = result[0][0]; 
         P = result[1];  
@@ -110,7 +152,7 @@ void main() {
             material = vec3(.5,.17,0.);
             highlight = 1.2 * material;
             power = 8.;
-            color = 0.3 * material; //+ max(0., dot(N, L));
+            color = 0.3 * material;
 
             for (int j = 0; j < 6; j++) {
                 if (j != i) {
@@ -130,7 +172,7 @@ void main() {
         }
     }
 
-    gl_FragColor = vec4(sqrt(color), 1.0);  // Final color
+    gl_FragColor = vec4(sqrt(color), 1.0);  
 }
 
 
