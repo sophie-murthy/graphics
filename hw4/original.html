@@ -238,13 +238,13 @@ setTimeout(() => {
       }
 
       addShape(A, transform(sphere, translation(0,-.35,0)),
-                  transform(sphere, translation(0, .35,0)), sphere);
+                  transform(sphere, translation(0, .35,0)));
       addShape(B, xCylinder, yCylinder, zCylinder);
       //addShape(C, sphere, transform(xSlab, scale(.5,.5,.5)));
-      addShape(C, sphere, sphere, sphere);
-      addShape(D, xCylinder, xSlab, xSlab);
+      addShape(C, sphere);
+      addShape(D, xCylinder, xSlab);
       addShape(E, xSlab, ySlab, zSlab);
-      addShape(F, yParaboloid, ySlab, yCylinder);
+      addShape(F, yParaboloid, ySlab);
 
 /*
       let C1 = translation(0, 0, -20);
