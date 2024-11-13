@@ -1,0 +1,41 @@
+<body bgcolor=#ffffff>
+<canvas id=textureCanvas width=512 height=512 style=position:absolute;left:-1000></canvas>
+<center><canvas id=canvas1 width=800 height=800></canvas>
+<script src=lib.js></script>
+<script>
+
+texture(0, 'brick.png');
+texture(1, 'polka_dots.png');
+texture(2, textureCanvas);    // NOTE: THIS IS AN HTML CANVAS BEING USED AS A TEXTURE SOURCE.
+texture(3, 'bumpy.jpg');
+texture(4, 'check-button.png');
+
+function drawFrame() {
+   requestAnimationFrame(drawFrame);
+   let t = Date.now() / 1000;
+
+   // CHANGE THE CONTENT OF THE 2D CANVAS EVERY ANIMATION FRAME.
+
+   let ctx = textureCanvas.getContext('2d');
+   ctx.fillStyle = '#ffd0d0';
+   ctx.fillRect(0, 0, 512, 512);
+   ctx.fillStyle = 'black';
+   ctx.font = '100px Arial';
+   let minutes = (t/60>>0)%60, seconds = t%60>>0;        // FORMAT TIME TO MINUTES & SECONDS.
+   ctx.fillText(minutes + 'm ' + seconds + 's', 60, 280);
+
+   M.S().perspective(3);
+      M.S().move(-.6, .3,0).turnY( t).scale(.2).draw(Tube(30)    , [1,1,1]   , 1,  0   ).R();
+      M.S().move(  0, .3,0).turnY( 0).scale(.2).draw(Sphere(30)  , [1,1,0]   , 1,      ).R();
+      M.S().move( .6, .3,0).turnY( t).scale(.2).draw(Cylinder(30), [1,1,1]   , 1,  0   ).R();
+      M.S().move(-.6,-.3,0).turnX(-t).scale(.2).draw(Cube()      , [1,1,1]   , 1,  1   ).R();
+      M.S().move( .6,-.3,0).turnY(-t).scale(.2).draw(Torus(30)   , [1,.5,.3] , 1, -1, 3).R();
+      M.S().move(  0,-.3,0).turnX( t).scale(.2).draw(Cube()      , [1,1,1]   , 1,  2,-1).R();
+
+      M.S().move(0,.3,.5).turnY( t).scale(.2).draw(Square()      , [1,1,1]   , 1,  4   ).R();
+   M.R();
+}
+requestAnimationFrame(drawFrame);
+
+</script>
+
