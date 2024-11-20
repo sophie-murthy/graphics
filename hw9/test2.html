@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+    <center><canvas id="canvas1" width="800" height="800"></canvas></center>
+    <script src="lib.js"></script>
+    <script>
+        function createCylinderMesh(radius, height, segments) {
+            let vertices = [];
+            for (let i = 0; i <= segments; i++) {
+                let theta = (2 * Math.PI * i) / segments;
+                let x = radius * Math.cos(theta);
+                let y = radius * Math.sin(theta);
+
+                vertices.push(x, y, 0);
+
+                vertices.push(x, y, height);
+            }
+            return new Float32Array(vertices.flat());
+        }
+
+
+        function generateCylinders(splinePoints, radius, segments) {
+            let cylinders = [];
+            for (let i = 0; i < splinePoints.length - 1; i++) {
+                let p1 = splinePoints[i];
+                let p2 = splinePoints[i + 1];
+                let direction = subtract(p2, p1);
+                let length = Math.sqrt(direction[0]**2 + direction[1]**2 + direction[2]**2);
+
+                direction = normalize(direction);
+
+                let cylinderMesh = createCylinderMesh(radius, length, segments);
+
+                cylinders.push({
+                    mesh: cylinderMesh,
+                    start: p1,
+                    end: p2,
+                    direction: direction
+                });
+            }
+
+            return cylinders;
+        }
+
+function drawCylinders(cylinders) {
+    cylinders.forEach((cylinder, index) => {
+        let direction = cylinder.direction;
+        let length = Math.sqrt(
+            direction[0]**2 +
+            direction[1]**2 +
+            direction[2]**2
+        );
+
+        let angle = Math.acos(direction[2]);
+        let axis = cross([0, 0, 1], direction);
+
+        if (Math.abs(axis[0]) < 1e-6 && Math.abs(axis[1]) < 1e-6 && Math.abs(axis[2]) < 1e-6) {
+            axis = [1, 0, 0];
+        }
+
+        M.S();
+        M.move(cylinder.start[0], cylinder.start[1], cylinder.start[2]);
+        if (length > 0.001) M.turnX(angle, axis[0], axis[1], axis[2]);
+        M.draw({ type: 1, mesh: cylinder.mesh }, [0.7, 0.7, 0.7]);
+        M.R();
+
+        if (index < cylinders.length - 1) {
+            let nextCylinder = cylinders[index + 1];
+
+            let connectionDirection = subtract(nextCylinder.start, cylinder.end);
+            let connectionLength = Math.sqrt(
+                connectionDirection[0]**2 +
+                connectionDirection[1]**2 +
+                connectionDirection[2]**2
+            );
+
+            if (connectionLength > 1e-6) {
+                connectionDirection = normalize(connectionDirection);
+
+                let connectorMesh = createCylinderMesh(radius * 0.9, connectionLength, segments);
+                M.S();
+                M.move(cylinder.end[0], cylinder.end[1], cylinder.end[2]);
+                let connectAngle = Math.acos(connectionDirection[2]);
+                let connectAxis = cross([0, 0, 1], connectionDirection);
+                if (Math.abs(connectAxis[0]) < 1e-6 && Math.abs(connectAxis[1]) < 1e-6 && Math.abs(connectAxis[2]) < 1e-6) {
+                    connectAxis = [1, 0, 0];
+                }
+                M.turnX(connectAngle, connectAxis[0], connectAxis[1], connectAxis[2]);
+                M.draw({ type: 1, mesh: connectorMesh }, [0.5, 0.5, 0.5]);
+                M.R();
+            }
+        }
+    });
+}
+
+
+        function cubicBezier(A, B, C, D, t) {
+            let u = 1 - t;
+            return [
+                u*u*u * A[0] + 3*u*u*t * B[0] + 3*u*t*t * C[0] + t*t*t * D[0],
+                u*u*u * A[1] + 3*u*u*t * B[1] + 3*u*t*t * C[1] + t*t*t * D[1],
+                u*u*u * A[2] + 3*u*u*t * B[2] + 3*u*t*t * C[2] + t*t*t * D[2]
+            ];
+        }
+
+        function generateSplinePoints(controlPoints, stepsPerSegment) {
+            let points = [];
+            for (let i = 0; i < controlPoints.length - 3; i += 3) {
+                let segmentPoints = [];
+                for (let t = 0; t <= 1; t += 1 / stepsPerSegment) {
+                    segmentPoints.push(
+                        cubicBezier(
+                            controlPoints[i], 
+                            controlPoints[i + 1], 
+                            controlPoints[i + 2], 
+                            controlPoints[i + 3], 
+                            t
+                        )
+                    );
+                }
+                if (i > 0) segmentPoints.shift();
+                points.push(...segmentPoints);
+            }
+            return points;
+        }
+
+        function subtract(v1, v2) {
+            return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]];
+        }
+
+        function computeTangent(p0, p1, p2, p3, t) {
+            let u = 1 - t;
+            return [
+                -3*u*u*p0[0] + 3*(3*u*u - 2*u)*p1[0] + 3*(2*t - 3*t*t)*p2[0] + 3*t*t*p3[0],
+                -3*u*u*p0[1] + 3*(3*u*u - 2*u)*p1[1] + 3*(2*t - 3*t*t)*p2[1] + 3*t*t*p3[1],
+                -3*u*u*p0[2] + 3*(3*u*u - 2*u)*p1[2] + 3*(2*t - 3*t*t)*p2[2] + 3*t*t*p3[2],
+            ];
+        }
+
+        function normalize(v) {
+            let length = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
+            return v.map(component => component / length);
+        }
+
+        function cross(v1, v2) {
+            return [
+                v1[1] * v2[2] - v1[2] * v2[1],
+                v1[2] * v2[0] - v1[0] * v2[2],
+                v1[0] * v2[1] - v1[1] * v2[0]
+            ];
+        }
+
+        function adjustControlPoints(controlPoints) {
+            let adjustedPoints = [...controlPoints];
+
+            for (let i = 3; i < controlPoints.length - 3; i += 3) {
+                let P2 = controlPoints[i - 1];
+                let P4 = controlPoints[i + 1];
+                let P3 = controlPoints[i];
+
+                let adjustedP4 = [
+                    2 * P3[0] - P2[0],
+                    2 * P3[1] - P2[1],
+                    2 * P3[2] - P2[2]
+                ];
+
+                adjustedPoints[i + 1] = adjustedP4;
+            }
+
+            return adjustedPoints;
+        }
+
+        let controlPoints = [
+            [-5, 4, 0], 
+            [-4.5, 4, 0],
+            [-4, 4, 0], 
+            [-3, 2, 0],
+            [-2, 0, 0],
+            [-1, -1, 0],
+            [-0.5, 0, 0],
+            [1.5, 0, 0],
+            [2, 0.667, 0],
+            [2.5, 2, 0],
+            [2, 3.333, 0],
+            [1.5, 4, 0],
+            [1, 3.333, 0],
+            [0.5, 2, 0],
+            [1, 0.667, 0],
+            [3.5, 0, 0],
+            [4.5, -1, 0],
+            [5, -1, 0]
+
+
+        ];
+
+        controlPoints = adjustControlPoints(controlPoints);
+        let splinePoints = generateSplinePoints(controlPoints, 50);
+
+        let cylinders = generateCylinders(splinePoints, 0.1, 16);
+
+        function drawFrame() {
+            requestAnimationFrame(drawFrame);
+
+            M.identity();
+            M.perspective(3);
+            M.move(0, -1, -8);
+
+            drawCylinders(cylinders);
+
+            let totalSegments = (controlPoints.length - 1) / 3;
+            let t = (Date.now() % 5000) / 5000;
+            let normalizedT = t * totalSegments; 
+            let segment = Math.floor(normalizedT);
+            let localT = normalizedT - segment;
+
+            let p0 = controlPoints[segment * 3];
+            let p1 = controlPoints[segment * 3 + 1];
+            let p2 = controlPoints[segment * 3 + 2];
+            let p3 = controlPoints[segment * 3 + 3];
+
+            let carPosition = cubicBezier(p0, p1, p2, p3, localT);
+
+            let tangent = computeTangent(p0, p1, p2, p3, localT);
+            tangent = normalize(tangent);
+
+            let yaw = Math.atan2(tangent[0], tangent[2]);
+            let pitch = Math.asin(-tangent[1]);
+
+            M.S();
+            M.move(carPosition[0], carPosition[1], carPosition[2])
+            .turnY(yaw)
+            .turnX(pitch)
+            .scale(0.2, 0.2, 0.4)
+            .draw(Cube(30), [1, 0, 0])
+            .R();
+
+        }
+
+        requestAnimationFrame(drawFrame);
+    </script>
+</body>
+</html>
