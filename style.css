@@ -380,3 +380,99 @@ h3 {
 .hw4:hover {
     color: rgb(166, 203, 214);
 }
+
+.hw5 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 450px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw5:hover {
+    color: rgb(166, 203, 214);
+}
+
+.hw6 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 500px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw6:hover {
+    color: rgb(166, 203, 214);
+}
+
+.hw7 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 550px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw7:hover {
+    color: rgb(166, 203, 214);
+}
+
+.hw8 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 600px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw8:hover {
+    color: rgb(166, 203, 214);
+}
+
+.hw9 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 650px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw9:hover {
+    color: rgb(166, 203, 214);
+}
+
+.hw10 {
+        position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 700px;
+    font-size: 20px;
+    font-family: Didot;
+    text-align: center;
+    color: black;
+
+}
+
+.hw10:hover {
+    color: rgb(166, 203, 214);
+}
