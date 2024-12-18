@@ -1,0 +1,2079 @@
+<body style="background-color: #000000;"><font face="courier"></font>
+<div style="position: absolute; right: 100px; top: 45%; transform: translateY(-50%);">
+   <canvas id="canvas1" width="700" height="700"></canvas>
+</div>
+<div style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%);">
+   <table>
+      <tr><td><input type="button" id="characterButton" value="Character" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+      <tr><td><input type="button" id="faceButton" value="Face" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+      <tr><td><input type="button" id="bodyButton" value="Body" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+      <tr><td><input type="button" id="outfitButton" value="Outfit" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+      <tr><td><input type="button" id="walkButton" value="Walk" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+      <tr><td><input type="button" id="personalityButton" value="Personality" style="background-color: white; color: #185068; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;"></td></tr>
+   </table>
+</div>
+<div style="position: absolute; left: 175px; top: 50%; transform: translateY(-50%);">
+   <table id = "choices">
+   </table>
+</div>
+<div id = "c2div" style="position: absolute; left: 275px; top: 50%; transform: translateY(-50%);">
+   <table id = "choices2">
+   </table>
+</div>
+<div id = "sliderContainer" style = "position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px;">
+
+</div>
+
+<script src=lib.js></script>
+<script>
+
+let buttons = document.querySelectorAll('input[type="button"]');
+let clickedButton1 = null;
+buttons.forEach(button => {
+   button.addEventListener('click', () => {
+      if (clickedButton1) {
+         clickedButton1.style.backgroundColor = 'white';
+         clickedButton1.style.color = '#185068';
+      }
+      clickedButton1 = button;
+      clickedButton1.style.backgroundColor = '#185068';
+      clickedButton1.style.color = 'white';
+   })
+})
+
+let characterButton = document.getElementById('characterButton');
+let faceButton = document.getElementById('faceButton');
+let bodyButton = document.getElementById('bodyButton');
+let outfitButton = document.getElementById('outfitButton');
+let walkButton = document.getElementById('walkButton');
+let personalityButton = document.getElementById('personalityButton');
+
+let character = {
+   type: null,
+   gender: null,
+   animal: null
+}
+
+let face = {
+   shape: null,
+   eyes: {
+      shape: null,
+      color: null,
+      size: null
+   },
+   nose: null,
+   mouth: {
+      shape: null,
+      color: null,
+      size: null
+   },
+   hair: {
+      style: null,
+      color: null
+   }
+}
+
+let body = {
+   weight: null,
+   height: null,
+   hipwidth: null,
+   color: "#ffffff"
+}
+
+let outfit = {
+   top: null,
+   bottom: null,
+   shoes: null,
+   accessories: null
+}
+
+let walk = {
+   type: null,
+   go: 0,
+   normal: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 0.5,
+      feetlift: 0.5,
+      hipsway: 0.5,
+      twist: 0.5,
+      pace: 0.5,
+   },
+   sassy: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 1,
+      feetlift: 0.8,
+      hipsway: 2,
+      twist: 0.5,
+      pace: 0.43,
+   },
+   energetic: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 1,
+      feetlift: 1,
+      hipsway: 0.3,
+      twist: 0.5,
+      pace: 1,
+   },
+   sad: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 0.5,
+      feetlift: 0,
+      hipsway: 1,
+      twist: 0.5,
+      pace: 0.33,
+   },
+   marching: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 0.5,
+      feetlift: 2,
+      hipsway: 0.5,
+      twist: 0.5,
+      pace: 0.5,
+   },
+   angry: {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 1,
+      feetlift: 1,
+      hipsway: 0,
+      twist: 0.5,
+      pace: 0.45,
+   },
+   build : {
+      facing: 0.5,
+      heading: 0.5,
+      stride: 0.5,
+      feetlift: 0.5,
+      hipsway: 0.5,
+      twist: 0.5,
+      pace: 0.5,
+   }
+
+
+}
+
+characterButton.addEventListener('click', () => {
+   if (clickedButton1 == characterButton) {
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+      let sliderContainer = document.getElementById('sliderContainer');
+      sliderContainer.innerHTML = '';
+
+      let choice2_div = document.getElementById('c2div');
+      choice2_div.style.left = '275px';
+
+      walk.go = 0;
+      
+      let tr1 = document.createElement('tr');
+      let td1 = document.createElement('td');
+      choices.appendChild(tr1);
+      tr1.appendChild(td1);
+      let button1 = document.createElement('input');
+      button1.type = 'button';
+      button1.value = 'Human';
+      if (character.type == 'Human') {
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+      } else {
+         button1.style.backgroundColor = 'white';
+         button1.style.color = '#185068';
+      }
+      button1.style.padding = '10px';
+      button1.style.border = 'none';
+      button1.style.borderRadius = '4px';
+      button1.style.cursor = 'pointer';
+      button1.style.width = '75px';
+      button1.addEventListener('click', () => {
+         character.type = 'Human';
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+         button2.style.backgroundColor = 'white';
+         button2.style.color = '#185068';
+
+         let tr3 = document.createElement('tr');
+         let td3 = document.createElement('td');
+         choices2.appendChild(tr3);
+         tr3.appendChild(td3);
+         let button3 = document.createElement('input');
+         button3.type = 'button';
+         button3.value = "Male";
+         if (character.gender == 'Male') {
+            button3.style.backgroundColor = '#185068';
+            button3.style.color = 'white';
+         } else {
+            button3.style.backgroundColor = 'white';
+            button3.style.color = '#185068';
+         }
+         button3.style.padding = '10px 20px';
+         button3.style.border = 'none';
+         button3.style.borderRadius = '4px';
+         button3.style.cursor = 'pointer';
+         button3.style.width = '75px';
+
+         let button4 = document.createElement('input');
+         button4.type = 'button';
+         let tr4 = document.createElement('tr');
+         let td4 = document.createElement('td');
+         choices2.appendChild(tr4);
+         tr4.appendChild(td4);
+         button4.value = "Female";
+         if (character.gender == "Female") {
+            button4.style.backgroundColor = '#185068';
+            button4.style.color = 'white';
+         } else {
+            button4.style.backgroundColor = 'white';
+            button4.style.color = '#185068';
+         }
+         button4.style.padding = '10px';
+
+         button4.style.border = 'none';
+         button4.style.borderRadius = '4px';
+         button4.style.cursor = 'pointer';
+         button4.style.width = '75px';
+         button4.style.textAlign = 'center';
+         button3.addEventListener('click', () => {
+            character.gender = 'Male';
+            character.animal = null;
+            button3.style.backgroundColor = '#185068';
+            button3.style.color = 'white';
+            button4.style.backgroundColor = 'white';
+            button4.style.color = '#185068';
+         });
+         button4.addEventListener('click', () => {
+            character.gender = "Female";
+            character.animal = null;
+            button4.style.backgroundColor = '#185068';
+            button4.style.color = 'white';
+            button3.style.backgroundColor = 'white';
+            button3.style.color = '#185068';
+         });
+
+         td3.appendChild(button3);
+         td4.appendChild(button4);
+
+
+      })
+      td1.appendChild(button1);
+
+
+      let tr2 = document.createElement('tr');
+      let td2 = document.createElement('td');
+      choices.appendChild(tr2);
+      tr2.appendChild(td2);
+      let button2 = document.createElement('input');
+      button2.type = 'button';
+      button2.value = 'Animal';
+      if (character.type == 'Animal') {
+         button2.style.backgroundColor = '#185068';
+         button2.style.color = 'white';
+      } else {
+         button2.style.backgroundColor = 'white';
+         button2.style.color = '#185068';
+      }
+      button2.style.padding = '10px';
+      button2.style.border = 'none';
+      button2.style.borderRadius = '4px';
+      button2.style.cursor = 'pointer';
+      button2.style.width = '75px';
+      button2.addEventListener('click', () => {
+         character.type = 'Animal';
+         button2.style.backgroundColor = '#185068';
+         button2.style.color = 'white';
+         button1.style.backgroundColor = 'white';
+         button1.style.color = '#185068';
+
+         let choices2 = document.getElementById('choices2');
+         choices2.innerHTML = '';
+         let tr3 = document.createElement('tr');
+         let td3 = document.createElement('td');
+         choices2.appendChild(tr3);
+         tr3.appendChild(td3);
+         let button3 = document.createElement('input');
+         button3.type = 'button';
+         button3.value = "Dog";
+         if (character.animal == 'Dog') {
+            button3.style.backgroundColor = '#185068';
+            button3.style.color = 'white';
+         } else {
+            button3.style.backgroundColor = 'white';
+            button3.style.color = '#185068';
+         }
+         button3.style.padding = '10px';
+         button3.style.border = 'none';
+         button3.style.borderRadius = '4px';
+         button3.style.cursor = 'pointer';
+         button3.style.width = '75px';
+
+         let button4 = document.createElement('input');
+         button4.type = 'button';
+         let tr4 = document.createElement('tr');
+         let td4 = document.createElement('td');
+         choices2.appendChild(tr4);
+         tr4.appendChild(td4);
+         button4.value = "Cat";
+         if (character.animal == "Cat") {
+            button4.style.backgroundColor = '#185068';
+            button4.style.color = 'white';
+         } else {
+            button4.style.backgroundColor = 'white';
+            button4.style.color = '#185068';
+         }
+         button4.style.padding = '10px';
+         
+         button4.style.border = 'none';
+         button4.style.borderRadius = '4px';
+         button4.style.cursor = 'pointer';
+         button4.style.width = '75px';
+         button4.style.textAlign = 'center';
+
+         button3.addEventListener('click', () => {
+            character.animal = 'Dog';
+            character.gender = null;
+            button3.style.backgroundColor = '#185068';
+            button3.style.color = 'white';
+            button4.style.backgroundColor = 'white';
+            button4.style.color = '#185068';
+         });
+
+         button4.addEventListener('click', () => {
+            character.animal = "Cat";
+            character.gender = null;
+            button4.style.backgroundColor = '#185068';
+            button4.style.color = 'white';
+            button3.style.backgroundColor = 'white';
+            button3.style.color = '#185068';
+         });
+
+         td3.appendChild(button3);
+         td4.appendChild(button4);
+      })
+      td2.appendChild(button2);
+   }
+})
+
+faceButton.addEventListener('click', () => {
+   if (clickedButton1 == faceButton) {
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+      let sliderContainer = document.getElementById('sliderContainer');
+      sliderContainer.innerHTML = '';
+
+      let choice2_div = document.getElementById('c2div');
+      choice2_div.style.left = '275px';
+
+      walk.go = 0;
+      
+      let tr1 = document.createElement('tr');
+      let td1 = document.createElement('td');
+      choices.appendChild(tr1);
+      tr1.appendChild(td1);
+      let button1 = document.createElement('input');
+      button1.type = 'button';
+      button1.value = 'Shape';
+      button1.style.backgroundColor = 'white';
+      button1.style.color = '#185068';
+      button1.style.padding = '10px';
+      button1.style.border = 'none';
+      button1.style.borderRadius = '4px';
+      button1.style.cursor = 'pointer';
+      button1.style.width = '75px';
+
+      let tr2 = document.createElement('tr');
+      let td2 = document.createElement('td');
+      choices.appendChild(tr2);
+      tr2.appendChild(td2);
+      let button2 = document.createElement('input');
+      button2.type = 'button';
+      button2.value = 'Eyes';
+      button2.style.backgroundColor = 'white';
+      button2.style.color = '#185068';
+      button2.style.padding = '10px';
+      button2.style.border = 'none';
+      button2.style.borderRadius = '4px';
+      button2.style.cursor = 'pointer';
+      button2.style.width = '75px';
+
+      let tr3 = document.createElement('tr');
+      let td3 = document.createElement('td');
+      choices.appendChild(tr3);
+      tr3.appendChild(td3);
+      let button3 = document.createElement('input');
+      button3.type = 'button';
+      button3.value = 'Nose';
+      button3.style.backgroundColor = 'white';
+      button3.style.color = '#185068';
+      button3.style.padding = '10px';
+      button3.style.border = 'none';
+      button3.style.borderRadius = '4px';
+      button3.style.cursor = 'pointer';
+      button3.style.width = '75px';
+
+      let tr4 = document.createElement('tr');
+      let td4 = document.createElement('td');
+      choices.appendChild(tr4);
+      tr4.appendChild(td4);
+      let button4 = document.createElement('input');
+      button4.type = 'button';
+      button4.value = 'Mouth';
+      button4.style.backgroundColor = 'white';
+      button4.style.color = '#185068';
+      button4.style.padding = '10px';
+      button4.style.border = 'none';
+      button4.style.borderRadius = '4px';
+      button4.style.cursor = 'pointer';
+      button4.style.width = '75px';
+
+      let tr5 = document.createElement('tr');
+      let td5 = document.createElement('td');
+      choices.appendChild(tr5);
+      tr5.appendChild(td5);
+      let button5 = document.createElement('input');
+      button5.type = 'button';
+      button5.value = 'Hair';
+      button5.style.backgroundColor = 'white';
+      button5.style.color = '#185068';
+      button5.style.padding = '10px';
+      button5.style.border = 'none';
+      button5.style.borderRadius = '4px';
+      button5.style.cursor = 'pointer';
+      button5.style.width = '75px';
+
+      let button_list = [button1, button2, button3, button4, button5];
+
+      button1.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '275px';
+
+         choices2.innerHTML = '';
+
+          let select = document.createElement('select');
+          select.style.width = '100px';
+          select.style.height = '35px';
+          select.style.border = 'none';
+          select.style.color = '#185068';
+          select.style.borderRadius = '4px';
+          select.style.cursor = 'pointer';
+          let option1 = document.createElement('option');
+          option1.value = 'Round';
+          option1.text = 'Round';
+          option1.style.textAlign = 'center';
+          let option2 = document.createElement('option');
+          option2.value = 'Square';
+          option2.text = 'Square';
+          option2.style.textAlign = 'center';
+          let option3 = document.createElement('option');
+          option3.value = 'Oval';
+          option3.text = 'Oval';
+          option3.style.textAlign = 'center';
+          let option4 = document.createElement('option');
+          option4.value = 'Heart';
+          option4.text = 'Heart';
+          option4.style.textAlign = 'center';
+
+          if (face.shape == 'Round' || !face.shape) {
+            option1.selected = true;
+            face.shape = 'Round';
+           } else if (face.shape == 'Square') {
+            option2.selected = true;
+           } else if (face.shape == 'Oval') {
+            option3.selected = true;
+           } else if (face.shape == 'Heart') {
+            option4.selected = true;
+           }
+
+          select.addEventListener('change', (event) => {
+            face.shape = event.target.value;
+           });
+
+          select.add(option1);
+          select.add(option2);
+          select.add(option3);
+          select.add(option4);
+
+          choices2.appendChild(select);
+
+        });
+
+        button2.addEventListener('click', () => {
+          button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+          })
+          button2.style.backgroundColor = '#185068';
+          button2.style.color = 'white';
+
+          let choice2_div = document.getElementById('c2div');
+          choice2_div.style.left = '275px';
+
+          choices2.innerHTML = '';
+
+           let tr1 = document.createElement('tr');
+           let td1 = document.createElement('td');
+           choices2.appendChild(tr1);
+           tr1.appendChild(td1);
+           let select = document.createElement('select');
+           select.style.width = '100px';
+           select.style.height = '35px';
+           select.style.border = 'none';
+           select.style.color = '#185068';
+           select.style.borderRadius = '4px';
+           select.style.cursor = 'pointer';
+           let option1 = document.createElement('option');
+           option1.value = 'Round';
+           option1.text = 'Round';
+           option1.style.textAlign = 'center';
+           let option2 = document.createElement('option');
+           option2.value = 'Almond';
+           option2.text = 'Almond';
+           option2.style.textAlign = 'center';
+           let option3 = document.createElement('option');
+           option3.value = 'Oval';
+           option3.text = 'Oval';
+           option3.style.textAlign = 'center';
+           let option4 = document.createElement('option');
+           option4.value = 'Upturned';
+           option4.text = 'Upturned';
+           option4.style.textAlign = 'center';
+
+           if (face.eyes.shape == 'Round' || !face.eyes.shape) {
+            option1.selected = true;
+            face.eyes.shape = 'Round';
+            } else if (face.eyes.shape == 'Almond') {
+            option2.selected = true;
+            } else if (face.eyes.shape == 'Oval') {
+            option3.selected = true;
+            } else if (face.eyes.shape == 'Upturned') {
+            option4.selected = true;
+            }
+
+           select.addEventListener('change', (event) => {
+            face.eyes.shape = event.target.value;
+           });
+           select.add(option1);
+           select.add(option2);
+           select.add(option3);
+           select.add(option4);
+
+           let label1 = document.createElement('label');
+           label1.innerText = 'Shape:';
+           label1.style.color = 'white';
+           label1.style.display = 'block';
+           label1.style.marginBottom = '5px';
+           td1.appendChild(label1);
+           td1.appendChild(select);
+
+           let tr2 = document.createElement('tr');
+           let td2 = document.createElement('td');
+           choices2.appendChild(tr2);
+           tr2.appendChild(td2);
+           let colorpicker = document.createElement('input');
+           colorpicker.type = 'color';
+           colorpicker.style.width = '100px';
+           colorpicker.style.height = '35px';
+           colorpicker.style.border = 'none';
+           colorpicker.style.color = '#185068';
+           colorpicker.style.borderRadius = '4px';
+           colorpicker.style.cursor = 'pointer';
+           colorpicker.value = face.eyes.color || '#ffffff';
+           colorpicker.addEventListener('input', (event) => {
+            face.eyes.color = event.target.value;
+           });
+
+           let label2 = document.createElement('label');
+           label2.innerText = 'Color:';
+           label2.style.color = 'white';
+           label2.style.display = 'block';
+           label2.style.marginBottom = '5px';
+           td2.appendChild(label2);
+           td2.appendChild(colorpicker);
+
+           let tr3 = document.createElement('tr');
+           let td3 = document.createElement('td');
+           choices2.appendChild(tr3);
+           tr3.appendChild(td3);
+           let size = document.createElement('input');
+           size.type = 'range';
+           size.min = '0';
+           size.max = '100';
+           size.value = face.eyes.size || '50';
+           size.style.width = '100px';
+           size.addEventListener('input', (event) => {
+            face.eyes.size = event.target.value;
+           });
+
+           let label3 = document.createElement('label');
+           label3.innerText = 'Size:';
+           label3.style.color = 'white';
+           label3.style.display = 'block';
+           label3.style.marginBottom = '5px';
+           td3.appendChild(label3);
+           td3.appendChild(size);
+
+          });
+
+        button3.addEventListener('click', () => {
+          button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+          })
+          button3.style.backgroundColor = '#185068';
+          button3.style.color = 'white';
+
+          let choice2_div = document.getElementById('c2div');
+          choice2_div.style.left = '275px';
+
+          choices2.innerHTML = '';
+
+          let tr1 = document.createElement('tr');
+          let td1 = document.createElement('td');
+          choices2.appendChild(tr1);
+          tr1.appendChild(td1);
+          let select = document.createElement('select');
+          select.style.width = '100px';
+          select.style.height = '35px';
+          select.style.border = 'none';
+          select.style.color = '#185068';
+          select.style.borderRadius = '4px';
+          select.style.cursor = 'pointer';
+          let option1 = document.createElement('option');
+          option1.value = 'Pointed';
+          option1.text = 'Pointed';
+          option1.style.textAlign = 'center';
+          let option2 = document.createElement('option');
+          option2.value = 'Round';
+          option2.text = 'Round';
+          option2.style.textAlign = 'center';
+          let option3 = document.createElement('option');
+          option3.value = 'Wide';
+          option3.text = 'Wide';
+          option3.style.textAlign = 'center';
+          let option4 = document.createElement('option');
+          option4.value = 'Small';
+          option4.text = 'Small';
+          option4.style.textAlign = 'center';
+
+          if (face.nose == 'Pointed' || !face.nose) {
+            option1.selected = true;
+            face.nose = 'Pointed';
+           } else if (face.nose == 'Round') {
+            option2.selected = true;
+           } else if (face.nose == 'Wide') {
+            option3.selected = true;
+           } else if (face.nose == 'Small') {
+            option4.selected = true;
+           }
+
+          select.addEventListener('change', (event) => {
+            face.nose = event.target.value;
+           });
+
+          select.add(option1);
+          select.add(option2);
+          select.add(option3);
+          select.add(option4);
+
+          td1.appendChild(select);
+
+      });
+
+      button4.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button4.style.backgroundColor = '#185068';
+         button4.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '275px';
+
+         choices2.innerHTML = '';
+
+         let tr1 = document.createElement('tr');
+         let td1 = document.createElement('td');
+         choices2.appendChild(tr1);
+         tr1.appendChild(td1);
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'Wide';
+         option1.text = 'Wide';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Full';
+         option2.text = 'Full';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Thin';
+         option3.text = 'Thin';
+         option3.style.textAlign = 'center';
+         let option4 = document.createElement('option');
+         option4.value = 'Heart';
+         option4.text = 'Heart';
+         option4.style.textAlign = 'center';
+
+         if (face.mouth == 'Wide' || !face.mouth) {
+            option1.selected = true;
+            face.mouth = 'Wide';
+           } else if (face.mouth == 'Full') {
+            option2.selected = true;
+           } else if (face.mouth == 'Thin') {
+            option3.selected = true;
+           } else if (face.mouth == 'Heart') {
+            option4.selected = true;
+           }
+
+         select.addEventListener('change', (event) => {
+            face.mouth.shape = event.target.value;
+         });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+         select.add(option4);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Shape:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         td1.appendChild(label1);
+         td1.appendChild(select);
+         
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = face.mouth.color || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            face.mouth.color = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+
+         let tr3 = document.createElement('tr');
+         let td3 = document.createElement('td');
+         choices2.appendChild(tr3);
+         tr3.appendChild(td3);
+         let size = document.createElement('input');
+         size.type = 'range';
+         size.min = '0';
+         size.max = '100';
+         size.value = face.mouth.size || '50';
+         size.style.width = '100px';
+         size.addEventListener('input', (event) => {
+            face.mouth.size = event.target.value;
+         });
+
+         let label3 = document.createElement('label');
+         label3.innerText = 'Size:';
+         label3.style.color = 'white';
+         label3.style.display = 'block';
+         label3.style.marginBottom = '5px';
+         td3.appendChild(label3);
+         td3.appendChild(size);
+
+      });
+
+      button5.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button5.style.backgroundColor = '#185068';
+         button5.style.color = 'white';
+
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '275px';
+
+         choices2.innerHTML = '';
+
+         let tr1 = document.createElement('tr');
+         let td1 = document.createElement('td');
+         choices2.appendChild(tr1);
+         tr1.appendChild(td1);
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'Down (Short)';
+         option1.text = 'Down (Short)';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Down (Long)';
+         option2.text = 'Down (Long)';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Ponytail';
+         option3.text = 'Ponytail';
+         option3.style.textAlign = 'center';
+         let option4 = document.createElement('option');
+         option4.value = 'Bun';
+         option4.text = 'Bun';
+         option4.style.textAlign = 'center';
+         let option5 = document.createElement('option');
+         option5.value = 'Buzz Cut';
+         option5.text = 'Buzz Cut';
+         option5.style.textAlign = 'center';
+         let option6 = document.createElement('option');
+         option6.value = 'Bald';
+         option6.text = 'Bald';
+         option6.style.textAlign = 'center';
+         let option7 = document.createElement('option');
+         option7.value = 'Short';
+         option7.text = 'Short';
+         option7.style.textAlign = 'center';
+
+         if (face.hair == 'Down (Short)' || !face.hair) {
+            option1.selected = true;
+            face.hair = 'Down (Short)';
+           } else if (face.hair == 'Down (Long)') {
+            option2.selected = true;
+           } else if (face.hair == 'Ponytail') {
+            option3.selected = true;
+           } else if (face.hair == 'Bun') {
+            option4.selected = true;
+           } else if (face.hair == 'Buzz Cut') {
+            option5.selected = true;
+           } else if (face.hair == 'Bald') {
+            option6.selected = true;
+           } else if (face.hair == 'Short') {
+            option7.selected = true;
+           }
+
+         select.addEventListener('change', (event) => {
+            face.hair = event.target.value;
+         });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+         select.add(option4);
+         select.add(option5);
+         select.add(option6);
+         select.add(option7);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Style:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         td1.appendChild(label1);
+         td1.appendChild(select);
+
+
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = face.hair.color || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            face.hair.color = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+
+      });
+
+      td1.appendChild(button1);
+      td2.appendChild(button2);
+      td3.appendChild(button3);
+      td4.appendChild(button4);
+      td5.appendChild(button5);
+
+   }
+})
+
+bodyButton.addEventListener('click', () => {
+   if (clickedButton1 == bodyButton) {
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+      let sliderContainer = document.getElementById('sliderContainer');
+      sliderContainer.innerHTML = '';
+
+      let choice2_div = document.getElementById('c2div');
+      choice2_div.style.left = '275px';
+
+      walk.go = 0;
+
+      let createSliderRow = (labelText, sliderValue, onChange) => {
+         let tr = document.createElement('tr');
+         let td = document.createElement('td');
+         let label = document.createElement('label');
+         label.innerText = labelText;
+         label.style.color = 'white';
+         label.style.display = 'inline-block';
+         label.style.width = '100px';
+         td.appendChild(label);
+         let slider = document.createElement('input');
+         slider.type = 'range';
+         slider.min = '0';
+         slider.max = '100';
+         slider.value = sliderValue || '50';
+         slider.style.width = '100px';
+         slider.addEventListener('input', onChange);
+         td.appendChild(slider);
+         tr.appendChild(td);
+         return tr;
+      };
+
+      let createColorRow = (labelText, colorValue, onChange) => {
+         let tr = document.createElement('tr');
+         let td = document.createElement('td');
+         let label = document.createElement('label');
+         label.innerText = labelText;
+         label.style.color = 'white';
+         label.style.display = 'inline-block';
+         label.style.width = '100px';
+         td.appendChild(label);
+         let colorInput = document.createElement('input');
+         colorInput.type = 'color';
+         colorInput.value = colorValue || '#ffffff';
+         colorInput.style.width = '100px';
+         colorInput.addEventListener('input', onChange);
+         td.appendChild(colorInput);
+         tr.appendChild(td);
+         return tr;
+      };
+
+      choices.appendChild(createSliderRow('Weight', body.weight, (e) => {
+         body.weight = e.target.value;
+      }));
+
+      choices.appendChild(createSliderRow('Height', body.height, (e) => {
+         body.height = e.target.value;
+      }));
+
+      choices.appendChild(createSliderRow('Hip Width', body.hipwidth, (e) => {
+         body.hipwidth = e.target.value;
+      }));
+
+      choices.appendChild(createColorRow('Color', body.color, (e) => {
+         body.color = e.target.value;
+      }));
+
+   }
+
+})
+
+outfitButton.addEventListener('click', () => {
+   if (clickedButton1 == outfitButton) {
+
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+      let sliderContainer = document.getElementById('sliderContainer');
+      sliderContainer.innerHTML = '';
+
+      let choice2_div = document.getElementById('c2div');
+      choice2_div.style.left = '275px';
+
+      walk.go = 0;
+
+      let tr1 = document.createElement('tr');
+      let td1 = document.createElement('td');
+      choices.appendChild(tr1);
+      tr1.appendChild(td1);
+      let button1 = document.createElement('input');
+      button1.type = 'button';
+      button1.value = 'Top';
+      button1.style.backgroundColor = 'white';
+      button1.style.color = '#185068';
+      button1.style.padding = '10px';
+      button1.style.border = 'none';
+      button1.style.borderRadius = '4px';
+      button1.style.cursor = 'pointer';
+      button1.style.width = '100px';
+
+
+      let tr2 = document.createElement('tr');
+      let td2 = document.createElement('td');
+      choices.appendChild(tr2);
+      tr2.appendChild(td2);
+      let button2 = document.createElement('input');
+      button2.type = 'button';
+      button2.value = 'Bottom';
+      button2.style.backgroundColor = 'white';
+      button2.style.color = '#185068';
+      button2.style.padding = '10px';
+      button2.style.border = 'none';
+      button2.style.borderRadius = '4px';
+      button2.style.cursor = 'pointer';
+      button2.style.width = '100px';
+
+
+      let tr3 = document.createElement('tr');
+      let td3 = document.createElement('td');
+      choices.appendChild(tr3);
+      tr3.appendChild(td3);
+      let button3 = document.createElement('input');
+      button3.type = 'button';
+      button3.value = 'Shoes';
+      button3.style.backgroundColor = 'white';
+      button3.style.color = '#185068';
+      button3.style.padding = '10px';
+      button3.style.border = 'none';
+      button3.style.borderRadius = '4px';
+      button3.style.cursor = 'pointer';
+      button3.style.width = '100px';
+
+      let tr4 = document.createElement('tr');
+      let td4 = document.createElement('td');
+      choices.appendChild(tr4);
+      tr4.appendChild(td4);
+      let button4 = document.createElement('input');
+      button4.type = 'button';
+      button4.value = 'Accessories';
+      button4.style.backgroundColor = 'white';
+      button4.style.color = '#185068';
+      button4.style.padding = '10px';
+      button4.style.border = 'none';
+      button4.style.borderRadius = '4px';
+      button4.style.cursor = 'pointer';
+      button4.style.width = '100px';
+
+      let button_list = [button1, button2, button3, button4];
+
+      button1.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '300px';
+         choices2.innerHTML = '';
+
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'T-shirt';
+         option1.text = 'T-shirt';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Tank top';
+         option2.text = 'Tank top';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Sweater';
+         option3.text = 'Sweater';
+         option3.style.textAlign = 'center';
+         let option4 = document.createElement('option');
+         option4.value = 'Button up';
+         option4.text = 'Button up';
+         option4.style.textAlign = 'center';
+
+         if (outfit.top == 'T-shirt' || !outfit.top) {
+            option1.selected = true;
+            outfit.top = 'T-shirt';
+          } else if (outfit.top == 'Tank top') {
+            option2.selected = true;
+          } else if (outfit.top == 'Sweater') {
+            option3.selected = true;
+          } else if (outfit.top == 'Button up') {
+            option4.selected = true;
+          }
+         
+          select.addEventListener('change', (event) => {
+            outfit.top = event.target.value;
+          });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+         select.add(option4);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Type:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         choices2.appendChild(label1);
+
+         choices2.appendChild(select);
+
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = outfit.topColor || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            outfit.topColor = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+
+      });
+
+      button2.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button2.style.backgroundColor = '#185068';
+         button2.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '300px';
+         choices2.innerHTML = '';
+
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'Pants';
+         option1.text = 'Pants';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Shorts';
+         option2.text = 'Shorts';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Skirt';
+         option3.text = 'Skirt';
+         option3.style.textAlign = 'center';
+         let option4 = document.createElement('option');
+         option4.value = 'Leggings';
+         option4.text = 'Leggings';
+         option4.style.textAlign = 'center';
+
+         if (outfit.bottom == 'Pants' || !outfit.bottom) {
+            option1.selected = true;
+            outfit.bottom = 'Pants';
+          } else if (outfit.bottom == 'Shorts') {
+            option2.selected = true;
+          } else if (outfit.bottom == 'Skirt') {
+            option3.selected = true;
+          } else if (outfit.bottom == 'Leggings') {
+            option4.selected = true;
+          }
+
+         select.addEventListener('change', (event) => {
+            outfit.bottom = event.target.value;
+          });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+         select.add(option4);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Type:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         choices2.appendChild(label1);
+         choices2.appendChild(select);
+
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = outfit.bottomColor || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            outfit.bottomColor = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+      });
+
+      button3.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button3.style.backgroundColor = '#185068';
+         button3.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '300px';
+         choices2.innerHTML = '';
+
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'Sneakers';
+         option1.text = 'Sneakers';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Boots';
+         option2.text = 'Boots';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Sandals';
+         option3.text = 'Sandals';
+         option3.style.textAlign = 'center';
+
+         if (outfit.shoes == 'Sneakers' || !outfit.shoes) {
+            option1.selected = true;
+            outfit.shoes = 'Sneakers';
+          } else if (outfit.shoes == 'Boots') {
+            option2.selected = true;
+          } else if (outfit.shoes == 'Sandals') {
+            option3.selected = true;
+          }
+
+         select.addEventListener('change', (event) => {
+            outfit.shoes = event.target.value;
+          });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Type:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         choices2.appendChild(label1);
+         choices2.appendChild(select);
+
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = outfit.shoesColor || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            outfit.shoesColor = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+
+      });
+
+      button4.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button4.style.backgroundColor = '#185068';
+         button4.style.color = 'white';
+
+         let choice2_div = document.getElementById('c2div');
+         choice2_div.style.left = '300px';
+         choices2.innerHTML = '';
+
+         let select = document.createElement('select');
+         select.style.width = '100px';
+         select.style.height = '35px';
+         select.style.border = 'none';
+         select.style.color = '#185068';
+         select.style.borderRadius = '4px';
+         select.style.cursor = 'pointer';
+         let option1 = document.createElement('option');
+         option1.value = 'Hat';
+         option1.text = 'Hat';
+         option1.style.textAlign = 'center';
+         let option2 = document.createElement('option');
+         option2.value = 'Glasses';
+         option2.text = 'Glasses';
+         option2.style.textAlign = 'center';
+         let option3 = document.createElement('option');
+         option3.value = 'Watch';
+         option3.text = 'Watch';
+         option3.style.textAlign = 'center';
+         let option4 = document.createElement('option');
+         option4.value = 'Necklace';
+         option4.text = 'Necklace';
+         option4.style.textAlign = 'center';
+         let option5 = document.createElement('option');
+         option5.value = 'Purse';
+         option5.text = 'Purse';
+         option5.style.textAlign = 'center';
+         let option6 = document.createElement('option');
+         option6.value = 'Sunglasses';
+         option6.text = 'Sunglasses';
+         option6.style.textAlign = 'center';
+
+         if (outfit.accessories == 'Hat' || !outfit.accessories) {
+            option1.selected = true;
+            outfit.accessories = 'Hat';
+          } else if (outfit.accessories == 'Glasses') {
+            option2.selected = true;
+          } else if (outfit.accessories == 'Watch') {
+            option3.selected = true;
+          } else if (outfit.accessories == 'Necklace') {
+            option4.selected = true;
+          } else if (outfit.accessories == 'Purse') {
+            option5.selected = true;
+          } else if (outfit.accessories == 'Sunglasses') {
+            option6.selected = true;
+          }
+
+         select.addEventListener('change', (event) => {
+            outfit.accessories = event.target.value;
+          });
+
+         select.add(option1);
+         select.add(option2);
+         select.add(option3);
+         select.add(option4);
+         select.add(option5);
+         select.add(option6);
+
+         let label1 = document.createElement('label');
+         label1.innerText = 'Type:';
+         label1.style.color = 'white';
+         label1.style.display = 'block';
+         label1.style.marginBottom = '5px';
+         choices2.appendChild(label1);
+         choices2.appendChild(select);
+
+         let tr2 = document.createElement('tr');
+         let td2 = document.createElement('td');
+         choices2.appendChild(tr2);
+         tr2.appendChild(td2);
+         let colorpicker = document.createElement('input');
+         colorpicker.type = 'color';
+         colorpicker.style.width = '100px';
+         colorpicker.style.height = '35px';
+         colorpicker.style.border = 'none';
+         colorpicker.style.color = '#185068';
+         colorpicker.style.borderRadius = '4px';
+         colorpicker.style.cursor = 'pointer';
+         colorpicker.value = outfit.accessoriesColor || '#ffffff';
+         colorpicker.addEventListener('input', (event) => {
+            outfit.accessoriesColor = event.target.value;
+         });
+
+         let label2 = document.createElement('label');
+         label2.innerText = 'Color:';
+         label2.style.color = 'white';
+         label2.style.display = 'block';
+         label2.style.marginBottom = '5px';
+         td2.appendChild(label2);
+         td2.appendChild(colorpicker);
+
+
+
+      });
+
+      td1.appendChild(button1);
+      td2.appendChild(button2);
+      td3.appendChild(button3);
+      td4.appendChild(button4);
+   
+
+   }
+})
+
+walkButton.addEventListener('click', () => {
+   if (clickedButton1 == walkButton) {
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+      
+      let choice2_div = document.getElementById('c2div');
+      choice2_div.style.left = '275px';
+
+      walk.go = 1;
+
+      let tr1 = document.createElement('tr');
+      let td1 = document.createElement('td');
+      choices.appendChild(tr1);
+      tr1.appendChild(td1);
+      let button1 = document.createElement('input');
+      button1.type = 'button';
+      button1.value = 'Normal';
+      button1.style.backgroundColor = 'white';
+      button1.style.color = '#185068';
+      button1.style.padding = '10px';
+      button1.style.border = 'none';
+      button1.style.borderRadius = '4px';
+      button1.style.cursor = 'pointer';
+      button1.style.width = '120px';
+
+      let tr2 = document.createElement('tr');
+      let td2 = document.createElement('td');
+      choices.appendChild(tr2);
+      tr2.appendChild(td2);
+      let button2 = document.createElement('input');
+      button2.type = 'button';
+      button2.value = 'Sassy';
+      button2.style.backgroundColor = 'white';
+      button2.style.color = '#185068';
+      button2.style.padding = '10px';
+      button2.style.border = 'none';
+      button2.style.borderRadius = '4px';
+      button2.style.cursor = 'pointer';
+      button2.style.width = '120px';
+
+      let tr3 = document.createElement('tr');
+      let td3 = document.createElement('td');
+      choices.appendChild(tr3);
+      tr3.appendChild(td3);
+      let button3 = document.createElement('input');
+      button3.type = 'button';
+      button3.value = 'Energetic';
+      button3.style.backgroundColor = 'white';
+      button3.style.color = '#185068';
+      button3.style.padding = '10px';
+      button3.style.border = 'none';
+      button3.style.borderRadius = '4px';
+      button3.style.cursor = 'pointer';
+      button3.style.width = '120px';
+
+      let tr4 = document.createElement('tr');
+      let td4 = document.createElement('td');
+      choices.appendChild(tr4);
+      tr4.appendChild(td4);
+      let button4 = document.createElement('input');
+      button4.type = 'button';
+      button4.value = 'Sad';
+      button4.style.backgroundColor = 'white';
+      button4.style.color = '#185068';
+      button4.style.padding = '10px';
+      button4.style.border = 'none';
+      button4.style.borderRadius = '4px';
+      button4.style.cursor = 'pointer';
+      button4.style.width = '120px';
+
+      let tr5 = document.createElement('tr');
+      let td5 = document.createElement('td');
+      choices.appendChild(tr5);
+      tr5.appendChild(td5);
+      let button5 = document.createElement('input');
+      button5.type = 'button';
+      button5.value = 'Marching';
+      button5.style.backgroundColor = 'white';
+      button5.style.color = '#185068';
+      button5.style.padding = '10px';
+      button5.style.border = 'none';
+      button5.style.borderRadius = '4px';
+      button5.style.cursor = 'pointer';
+      button5.style.width = '120px';
+
+      let tr6 = document.createElement('tr');
+      let td6 = document.createElement('td');
+      choices.appendChild(tr6);
+      tr6.appendChild(td6);
+      let button6 = document.createElement('input');
+      button6.type = 'button';
+      button6.value = 'Angry';
+      button6.style.backgroundColor = 'white';
+      button6.style.color = '#185068';
+      button6.style.padding = '10px';
+      button6.style.border = 'none';
+      button6.style.borderRadius = '4px';
+      button6.style.cursor = 'pointer';
+      button6.style.width = '120px';
+
+      let tr7 = document.createElement('tr');
+      let td7 = document.createElement('td');
+      choices.appendChild(tr7);
+      tr7.appendChild(td7);
+      let button7 = document.createElement('input');
+      button7.type = 'button';
+      button7.value = 'Build Your Own';
+      button7.style.backgroundColor = 'white';
+      button7.style.color = '#185068';
+      button7.style.padding = '10px';
+      button7.style.border = 'none';
+      button7.style.borderRadius = '4px';
+      button7.style.cursor = 'pointer';
+      button7.style.width = '120px';
+
+      let button_list = [button1, button2, button3, button4, button5, button6, button7];
+
+      if (walk.type == "Normal" || !walk.type) {
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+      } else if (walk.type == "Sassy") {
+         button2.style.backgroundColor = '#185068';
+         button2.style.color = 'white';
+      } else if (walk.type == "Energetic") {
+         button3.style.backgroundColor = '#185068';
+         button3.style.color = 'white';
+      } else if (walk.type == "Sad") {
+         button4.style.backgroundColor = '#185068';
+         button4.style.color = 'white';
+      } else if (walk.type == "Marching") {
+         button5.style.backgroundColor = '#185068';
+         button5.style.color = 'white';
+      } else if (walk.type == "Angry") {
+         button6.style.backgroundColor = '#185068';
+         button6.style.color = 'white';
+      } else if (walk.type == "Build Your Own") {
+         button7.style.backgroundColor = '#185068';
+         button7.style.color = 'white';
+      }
+
+      button1.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button1.style.backgroundColor = '#185068';
+         button1.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Normal';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button2.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button2.style.backgroundColor = '#185068';
+         button2.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Sassy';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button3.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button3.style.backgroundColor = '#185068';
+         button3.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Energetic';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button4.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button4.style.backgroundColor = '#185068';
+         button4.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Sad';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button5.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button5.style.backgroundColor = '#185068';
+         button5.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Marching';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button6.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button6.style.backgroundColor = '#185068';
+         button6.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Angry';
+         let sliderContainer = document.getElementById('sliderContainer');
+         sliderContainer.innerHTML = '';
+
+      });
+
+      button7.addEventListener('click', () => {
+         button_list.forEach(button => {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#185068';
+         })
+         button7.style.backgroundColor = '#185068';
+         button7.style.color = 'white';
+         choices2.innerHTML = '';
+         walk.type = 'Build Your Own';
+
+         let sliderContainer = document.getElementById('sliderContainer');
+           let createSlider = (id, min, max, value) => {
+            let slider = document.createElement('input');
+            slider.type = 'range';
+            slider.id = id;
+            slider.min = min;
+            slider.max = max;
+            slider.value = value;
+            slider.style.width = '100px';
+            return slider;
+           };
+           let createLabeledSlider = (labelText, id, min, max, value) => {
+            let container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.alignItems = 'center';
+
+            let label = document.createElement('label');
+            label.htmlFor = id;
+            label.innerText = labelText;
+            label.style.color = 'white';
+            label.style.marginBottom = '5px';
+
+            let slider = createSlider(id, min, max, value);
+
+            container.appendChild(label);
+            container.appendChild(slider);
+
+            return container;
+           };
+
+           let row1 = document.createElement('div');
+           row1.style.display = 'flex';
+           row1.style.justifyContent = 'center';
+           row1.style.gap = '10px';
+           let facingLabeledSlider = createLabeledSlider('Facing', 'facingSlider', 0, 100, walk.build.facing ? walk.build.facing * 100 : 50);
+            let headingLabeledSlider = createLabeledSlider('Heading', 'headingSlider', 0, 100, walk.build.heading ? walk.build.heading * 100 : 50);
+            let strideLabeledSlider = createLabeledSlider('Stride', 'strideSlider', 0, 100, walk.build.stride ? walk.build.stride * 100 : 50);
+
+            let facingSlider = facingLabeledSlider.querySelector('input');
+            facingSlider.addEventListener('input', () => {
+               walk.build.facing = facingSlider.value / 100;
+            });
+
+            let headingSlider = headingLabeledSlider.querySelector('input');
+            headingSlider.addEventListener('input', () => {
+               walk.build.heading = headingSlider.value / 100;
+            });
+
+            let strideSlider = strideLabeledSlider.querySelector('input');
+            strideSlider.addEventListener('input', () => {
+               walk.build.stride = strideSlider.value / 100;
+            });
+
+            row1.appendChild(facingLabeledSlider);
+            row1.appendChild(headingLabeledSlider);
+            row1.appendChild(strideLabeledSlider);
+
+           let row2 = document.createElement('div');
+           row2.style.display = 'flex';
+           row2.style.gap = '10px';
+
+
+            let legliftLabeledSlider = createLabeledSlider('Leg Lift', 'legliftSlider', 0, 100, walk.build.feetlift ? walk.build.feetlift * 100 : 50);
+            let hipswayLabeledSlider = createLabeledSlider('Hip Sway', 'hipswaySlider', 0, 100, walk.build.hipsway ? walk.build.hipsway * 100 : 50);
+            let twistLabeledSlider = createLabeledSlider('Twist', 'twistSlider', 0, 100, walk.build.twist ? walk.build.twist * 100 : 50);
+            let paceLabeledSlider = createLabeledSlider('Pace', 'paceSlider', 0, 100, walk.build.pace ? walk.build.pace * 100 : 50);
+
+            let legliftSlider = legliftLabeledSlider.querySelector('input');
+            legliftSlider.addEventListener('input', () => {
+               walk.build.feetlift = legliftSlider.value / 100;
+            });
+
+            let hipswaySlider = hipswayLabeledSlider.querySelector('input');
+            hipswaySlider.addEventListener('input', () => {
+               walk.build.hipsway = hipswaySlider.value / 100;
+            });
+
+            let twistSlider = twistLabeledSlider.querySelector('input');
+            twistSlider.addEventListener('input', () => {
+               walk.build.twist = twistSlider.value / 100;
+            });
+
+            let paceSlider = paceLabeledSlider.querySelector('input');
+            paceSlider.addEventListener('input', () => {
+               walk.build.pace = paceSlider.value / 100;
+            });
+
+            row2.appendChild(legliftLabeledSlider);
+            row2.appendChild(hipswayLabeledSlider);
+            row2.appendChild(twistLabeledSlider);
+            row2.appendChild(paceLabeledSlider);
+
+
+           sliderContainer.appendChild(row1);
+           sliderContainer.appendChild(row2);
+
+           document.body.appendChild(sliderContainer);
+
+      })
+
+      td1.appendChild(button1);
+      td2.appendChild(button2);
+      td3.appendChild(button3);
+      td4.appendChild(button4);
+      td5.appendChild(button5);
+      td6.appendChild(button6);
+      td7.appendChild(button7);
+
+
+
+
+   }
+})
+
+personalityButton.addEventListener('click', () => {
+   if (clickedButton1 == personalityButton) {
+      
+      let choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      let choices2 = document.getElementById('choices2');
+      choices2.innerHTML = '';
+
+
+   }
+})
+
+let sliders = document.getElementsByTagName('input');
+for (let slider in sliders)
+   if (sliders[slider].style)
+      sliders[slider].style.width = 100;
+
+trackMouse(canvas1);
+
+let myCube   = Cube();
+let myTube   = Tube(20);
+let mySphere = Sphere(20);
+
+startGL(canvas1);
+
+let sSway = new Spring();
+let sRoll = new Spring();
+sSway.setMass(5);
+sRoll.setMass(5);
+
+let downForce = 0;
+
+let previousTime, t = 0, tx = 0, tz = 0;
+
+function convertColortoRGB(color) {
+   let r = parseInt(color.substring(1, 3), 16) / 255;
+   let g = parseInt(color.substring(3, 5), 16) / 255;
+   let b = parseInt(color.substring(5, 7), 16) / 255;
+   return [r, g, b];
+}
+
+function drawFrame() {
+   requestAnimationFrame(drawFrame);
+
+   let height = body.height ? body.height / 100: 0.5;
+   let hipwidth = body.hipwidth ? body.hipwidth / 100 : 0.5;
+   let radius = body.weight ? body.weight / 100 : 0.5;
+   let armLength = 0.4;
+   let shoulderOffset = 0.15;
+   let armRadius = radius * 0.5;
+   let go = walk.go;
+   let facing = 0.5;
+   let heading = 0.5;
+   let stride = 0.5;
+   let leglift = 0.5;
+   let hipsway = 0.5;
+   let twist = 0.5;
+   let pace = 0.5;
+
+   height = height/2;
+   
+   if (walk.type == 'Normal') {
+      facing = walk.normal.facing;
+      heading = walk.normal.heading;
+      stride = walk.normal.stride;
+      leglift = walk.normal.feetlift;
+      hipsway = walk.normal.hipsway;
+      twist = walk.normal.twist;
+      pace = walk.normal.pace;
+   } else if (walk.type == 'Sassy') {
+      facing = walk.sassy.facing;
+      heading = walk.sassy.heading;
+      stride = walk.sassy.stride;
+      leglift = walk.sassy.feetlift;
+      hipsway = walk.sassy.hipsway;
+      twist = walk.sassy.twist;
+      pace = walk.sassy.pace;
+   } else if (walk.type == 'Energetic') {
+      facing = walk.energetic.facing;
+      heading = walk.energetic.heading;
+      stride = walk.energetic.stride;
+      leglift = walk.energetic.feetlift;
+      hipsway = walk.energetic.hipsway;
+      twist = walk.energetic.twist;
+      pace = walk.energetic.pace;
+   } else if (walk.type == 'Sad') {
+      facing = walk.sad.facing;
+      heading = walk.sad.heading;
+      stride = walk.sad.stride;
+      leglift = walk.sad.feetlift;
+      hipsway = walk.sad.hipsway;
+      twist = walk.sad.twist;
+      pace = walk.sad.pace;
+   } else if (walk.type == 'Marching') {
+      facing = walk.marching.facing;
+      heading = walk.marching.heading;
+      stride = walk.marching.stride;
+      leglift = walk.marching.feetlift;
+      hipsway = walk.marching.hipsway;
+      twist = walk.marching.twist;
+      pace = walk.marching.pace;
+   } else if (walk.type == 'Angry') {
+      facing = walk.angry.facing;
+      heading = walk.angry.heading;
+      stride = walk.angry.stride;
+      leglift = walk.angry.feetlift;
+      hipsway = walk.angry.hipsway;
+      twist = walk.angry.twist;
+      pace = walk.angry.pace;
+   } else if (walk.type == 'Build Your Own') {
+      facing = walk.build.facing;
+      heading = walk.build.heading;
+      stride = walk.build.stride;
+      leglift = walk.build.feetlift;
+      hipsway = walk.build.hipsway;
+      twist = walk.build.twist;
+      pace = walk.build.pace;
+   }
+
+   leglift *= go;
+   stride  *= go;
+
+   let r  = .01 + .10 * Math.pow(radius, 1.5);
+   let hw = .07 + .16 * hipwidth;
+   let yh = .5 + height;
+   let ll = yh/2-r*.49;
+
+   let time = Date.now() / 1000;
+
+   VM.identity().perspective(3).turnX(canvas1.ry/30).turnY(canvas1.rx/30);
+
+   let joint = (J, color) => M.S().move(J).scale(r).draw(mySphere,color).R();
+   let limb = (A,B, color) => M.S().move(mix(A,B,.5)).aim(subtract(A,B)).scale(r,r,distance(A,B)/2).draw(myTube,color).R();
+
+   let step = t => t % 2 < 1 ? 2 * ease(t % 1) - 1 : 1 - 2 * (t % 1);
+
+   let bodyColor = convertColortoRGB(body.color);
+
+   let face = TAU * facing - TAU/2;
+   let fc =  C(face);
+   let fs = -S(face);
+
+   let dir = TAU * heading - TAU/2;
+   let dc = 3 * C(dir) * stride;
+   let ds = 3 * S(dir) * stride;
+
+   if (previousTime) {
+      let dt = 2 * (time - previousTime) * pace;
+      t  += dt;
+      tx += dt * ds;
+      tz += dt * dc;
+   }
+   previousTime = time;
+
+   let lLift = .2 * Math.max(0, S(TAU*t)) * leglift;
+   let rLift = .2 * Math.max(0,-S(TAU*t)) * leglift;
+
+   let lStep = .1 * step(2*t  );
+   let rStep = .1 * step(2*t+1);
+
+   let swaying = Math.max(-.04, Math.min(.04, .4 * (rLift - lLift) * hipwidth));
+   let stepping = lStep + rStep;
+
+   sSway.setForce(swaying * Math.abs(C(dir - face)) - stepping * ds);
+   sSway.update(.1);
+   let sway = sSway.getPosition();
+
+   let LF = [ hw*fc + ds * lStep, r + lLift, hw*fs + lLift + dc * lStep];
+   let RF = [-hw*fc + ds * rStep, r + rLift,-hw*fs + rLift + dc * rStep];
+   let LH = [sway*dc + hw*fc, yh, sway*ds + hw*fs];
+   let RH = [sway*dc - hw*fc, yh, sway*ds - hw*fs];
+
+   sRoll.setForce(Math.max(LH[0] - LF[0], RF[0] - RH[0]));
+   sRoll.update(.1);
+   let roll = -.1 * sRoll.getPosition();
+
+   let H = mix(LH, RH, .5);
+
+   H[1] -= downForce;
+   let df = (a,b) => .1 * Math.max(0, distance(a,b) - 2*ll);
+   downForce = .9 * (downForce + df(LH,LF) + df(RH,RF));
+
+   let DH = scale(subtract(RH, LH), .5);
+   let rollHips = roll - sway * (hipsway - .5);
+   let rs = S(rollHips), rc = C(rollHips);
+
+   let dhx = DH[0] * rc;
+   let dhy = DH[1] + rs;
+   let dhz = DH[2] * rc;
+
+   let twistAngle = 2 * twist - 1;
+   let tc = C(twistAngle), ts = S(twistAngle);
+   DH = [tc * dhx + ts * dhz, dhy, -ts * dhx + tc * dhz];
+
+   LH = subtract(H, DH);
+   RH = add(H, DH);
+
+   let tc2 = C(twistAngle/2), ts2 = S(twistAngle/2);
+   let DH2 = [tc2 * dhx + ts2 * dhz, dhy, -ts2 * dhx + tc2 * dhz];
+   let getKnee = (H,F) => add(H, ik(ll, ll, subtract(F,H), cross([0,1,0], DH2)));
+   let LK = getKnee(LH, LF);
+   let RK = getKnee(RH, RF);
+
+   let LS = [shoulderOffset, height + 1, 0];
+   let RS = [-shoulderOffset, height + 1, 0];
+   let LW = [LS[0] + armLength * C(roll), LS[1], LS[2] + armLength * S(roll)];
+   let RW = [RS[0] + armLength * C(roll), RS[1], RS[2] + armLength * S(roll)];
+
+   drawScene(() => {
+      M.S().move(0,-.6,0);
+
+         joint(LF, bodyColor);
+         joint(RF, bodyColor);
+         joint(LH, bodyColor);
+         joint(RH, bodyColor);
+         joint(LK, bodyColor);
+         joint(RK, bodyColor);
+         limb(LF,LK, bodyColor);
+         limb(RF,RK, bodyColor);
+         limb(LK,LH, bodyColor);
+         limb(RK,RH, bodyColor);
+         limb(LH,RH, bodyColor);
+
+        joint(LS, bodyColor);
+        joint(RS, bodyColor);
+        joint(LW, bodyColor);
+        joint(RW, bodyColor);
+        limb(LS,LW, bodyColor);
+        limb(RS,RW, bodyColor);
+        
+
+
+         let T = d => Math.sign(d) - (d % 4) / 2;
+         M.S().scale(.75,1,.75);
+            M.S().scale(1,.001,1).draw(myCube,[.5,.2,.1]).R();
+            for (let i = 0 ; i <= 2 ; i += 2) {
+               M.S().move(T(tx+i),0,0).scale(.01,.002,1).draw(myCube,[0,0,0]).R();
+               M.S().move(0,0,T(tz+i)).scale(1,.002,.01).draw(myCube,[0,0,0]).R();
+            }
+         M.R();
+      M.R();
+   });
+}
+requestAnimationFrame(drawFrame);
+
+</script>
+
